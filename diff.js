@@ -42,7 +42,30 @@ var JsDiff = (function() {
     this.ignoreWhitespace = ignoreWhitespace;
   };
   Diff.prototype = {
-      diff: function(oldString, newString) {
+      diff: function(oldString, newString, options) {
+        if (options && options.useWorker) {
+          this.diffWithWorker(oldString, newString, options);
+        } else {
+          return this.diffClassic(oldString, newString);
+        }
+      },
+
+      diffWithWorker: function(oldString, newString, options) {
+        var worker = new Worker('/worker.js');
+
+        worker.onmessage = function(event) {
+          if (options.cb) {
+            options.cb(event.data);
+          }
+        };
+
+        worker.postMessage({
+          oldString: oldString,
+          newString: newString
+        });
+      },
+
+      diffClassic: function(oldString, newString) {
         // Handle the identity case (this is due to unrolling editLength == 0
         if (newString === oldString) {
           return [{ value: newString }];
@@ -186,12 +209,12 @@ var JsDiff = (function() {
   return {
     Diff: Diff,
 
-    diffChars: function(oldStr, newStr) { return CharDiff.diff(oldStr, newStr); },
-    diffWords: function(oldStr, newStr) { return WordDiff.diff(oldStr, newStr); },
-    diffWordsWithSpace: function(oldStr, newStr) { return WordWithSpaceDiff.diff(oldStr, newStr); },
-    diffLines: function(oldStr, newStr) { return LineDiff.diff(oldStr, newStr); },
+    diffChars: function(oldStr, newStr, options) { return CharDiff.diff(oldStr, newStr, options); },
+    diffWords: function(oldStr, newStr, options) { return WordDiff.diff(oldStr, newStr, options); },
+    diffWordsWithSpace: function(oldStr, newStr, options) { return WordWithSpaceDiff.diff(oldStr, newStr, options); },
+    diffLines: function(oldStr, newStr, options) { return LineDiff.diff(oldStr, newStr, options); },
 
-    diffCss: function(oldStr, newStr) { return CssDiff.diff(oldStr, newStr); },
+    diffCss: function(oldStr, newStr, options) { return CssDiff.diff(oldStr, newStr, options); },
 
     createPatch: function(fileName, oldStr, newStr, oldHeader, newHeader) {
       var ret = [];
