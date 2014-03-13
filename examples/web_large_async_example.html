@@ -1,0 +1,41 @@
+<pre id="display"></pre>
+<script src="../diff.js"></script>
+<script>
+  var data = [];
+
+  function cb (json) {
+    data.push(json);
+    if (data.length === 2) {
+      run();
+    }
+  }
+
+  function run() {
+    var one   = JSON.stringify(data[0]);
+    var other = JSON.stringify(data[1]);
+
+    one   = one.substr(0, 10000);
+    other = other.substr(0, 10000);
+
+    JsDiff.diffChars(one, other, {
+      useWorker: true,
+      cb: resultHandlerFn
+    });
+  }
+
+  function resultHandlerFn(diff) {
+    diff.forEach(function(part){
+      // green for additions, red for deletions
+      // grey for common parts
+      var color = part.added ? 'green' :
+        part.removed ? 'red' : 'grey';
+      var span = document.createElement('span');
+      span.style.color = color;
+      span.appendChild(document
+        .createTextNode(part.value));
+      display.appendChild(span);
+    });
+  }
+</script>
+<script src="http://www.flickr.com/services/feeds/photos_public.gne?tags=soccer&format=json&jsoncallback=cb"></script>
+<script src="http://www.flickr.com/services/feeds/photos_public.gne?tags=football&format=json&jsoncallback=cb"></script>
