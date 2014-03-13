@@ -34,7 +34,15 @@
   "devDependencies": {
     "mocha": "~1.6",
     "should": "~1.2",
-    "colors": "~0.6.2"
+    "colors": "~0.6.2",
+    "gulp": "~3.5.5",
+    "gulp-util": "~2.2.14",
+    "require-directory": "~1.2.0",
+    "gulp-rimraf": "0.0.9",
+    "gulp-concat": "~2.1.7",
+    "through": "~2.3.4",
+    "gulp-replace": "~0.2.0",
+    "when": "~2.8.0"
   },
   "optionalDependencies": {},
   "files": [
